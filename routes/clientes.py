@@ -26,7 +26,7 @@ def get_table():
 
 
 #POST
-@clientes_bp.route('/register', methods=['POST'])
+@clientes_bp.route('/registerClientes', methods=['POST'])
 def post_clientes():
     con = get_connection()
     try:
@@ -51,6 +51,36 @@ def post_clientes():
         cursor.close()
         con.close()
 
+
+#PATCH
+@clientes_bp.route('/changeClientes/<int:id>', methods=['PATCH'])
+def changeClientes(id):
+    con = get_connection()
+    try:
+        cursor = con.cursor()
+        
+        change = request.get_json()
+        if not change:
+            return jsonify({"menasgem": "Nenhum dado enviado para o PATCH"}),400
+
+        campos = ', '.join([f"{key} = %s" for key in change.keys()])
+
+        valores = list(change.values())
+        valores.append(id)
+
+        query = f"UPDATE Clientes SET {campos} WHERE id=%s"
+
+        cursor.execute(query, valores)
+        con.commit()
+        return jsonify({"UPDATED":"Dados atualizados com sucesso!"}),200
+
+    except Exception as e:
+        return jsonify({"Error": str(e)}),500
+    
+    finally:
+        cursor.close()
+        con.close()
+        
 
 #DELETE
 @clientes_bp.route('/delete/<int:id>', methods=['DELETE'])
