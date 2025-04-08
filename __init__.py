@@ -1,11 +1,11 @@
 from flask import Flask
-from routes.clientes import clientes_bp  # importa seus blueprints
+from routes.clientes import clientes_bp 
 from routes.produtos import produtos_bp
+from routes.vendas import vendas_bp
 
 def create_app():
     app = Flask(__name__)
 
-    # aqui você registra os blueprints
-    app.register_blueprint(clientes_bp, produtos_bp)
+    app.register_blueprint(clientes_bp, produtos_bp, vendas_bp)
 
     return app
