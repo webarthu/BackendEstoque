@@ -13,7 +13,7 @@ def registerVendas():
         cursor = con.cursor()
         nome = request.json.get('nome')
         id_cliente = request.json.get('id')
-        produtos = request.json.get([{'id_produto', 'quantidade'}])
+        produtos = request.json.get({'id_produto', 'quantidade'})
 
         if not nome and not id_cliente:
             return jsonify({"Error": "É necessário informar um nome ou id para cadastrar uma venda"}),400
@@ -23,15 +23,21 @@ def registerVendas():
 
         if id_cliente:
             cursor.execute("INSERT INTO Vendas (id_cliente, data_venda) VALUES (s%, )", (id_cliente, ))
+            id_venda = cursor.lastrowid
         
-        cursor.execute("SELECT id FROM Vendas WHERE ...")
-        id_venda = cursor.fetchone()
-        
-        cursor.execute("SELECT valor FROM Produtos WHERE id = %s ", (for i in produtos[0]))
+        valor_produto = (produtos[0] for i in produtos)
 
-        cursor.execute("INSERT INTO ItensVenda (id_produto, quantidade, valor_unitario) VALUES (s%, s%, s%)",(produtos.id_produto, produtos.quantidade, valor_unitario))
+        cursor.execute("SELECT valor FROM Produtos WHERE id = %s", (produtos[0] for i in produtos))
 
-        return jsonify({"Venda realizada!": "ID venda":id_venda}),200
+
+        for produto in produtos:
+            cursor.execute("SELECT valor FROM Produtos WHERE id=%s",["id_produto"])
+
+            valor_unitario = cursor.fetchone()[0]
+
+            cursor.execute("INSERT INTO ItensVenda (id_produto, quantidade, valor_unitario) VALUES (%s, %s, %s)",(produtos["id_produto"], produtos["quantidade"], valor_unitario))
+
+        return jsonify({"Message": "Venda realizada!", "ID venda": id_venda}),200
 
     except Exception as e:
         return jsonify({"Error", str(e)}),500
