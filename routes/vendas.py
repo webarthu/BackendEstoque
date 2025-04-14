@@ -4,7 +4,33 @@ from connection import get_connection
 vendas_bp = Blueprint('vendas', __name__)
 
 #GET
-
+@vendas_bp.route('/Vendas', methods=['GET'])
+def getVendas():
+    con = get_connection()
+    try:
+        cursor = con.cursor()
+        
+        cursor.execute("SELECT * FROM Vendas")
+        vendas = cursor.fetchall()
+        print (vendas)
+        resultado = []
+        for venda in vendas:
+            resultado.append({
+                "Venda_ID": venda[0],
+                "Data_Venda": venda[1].isoformat(),
+                "Cliente_ID": venda[2],
+                "Valor_Total": float(venda[3])
+            })
+        return jsonify(resultado),200
+        
+        con.commit()
+    
+    except Exception as e:
+        return jsonify({"Error": str(e)}),500
+    
+    finally:
+        cursor.close()
+        con.close()
 #POST
 @vendas_bp.route('/registerVendas', methods=['POST'])
 def registerVendas():
