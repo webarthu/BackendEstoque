@@ -7,7 +7,7 @@ Instale o Python: https://www.python.org/downloads/<br>
 
 Instale o pip (caso não venha com sua instalação do Python):<br> python -m ensurepip --upgrade<br>
 
-Clone este repositório:<br> git clone [https://github.com/seuusuario/seurepositorio.git](https://github.com/webarthu/BackendEstoque.git)<br>
+Clone este repositório:<br> git clone https://github.com/webarthu/BackendEstoque.git<br>
 
 Entre no diretório do projeto:<br> cd BackendEstoque<br>
 
