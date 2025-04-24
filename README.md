@@ -7,9 +7,9 @@ Instale o Python: https://www.python.org/downloads/<br>
 
 Instale o pip (caso não venha com sua instalação do Python):<br> python -m ensurepip --upgrade<br>
 
-Clone este repositório:<br> git clone https://github.com/seuusuario/seurepositorio.git<br>
+Clone este repositório:<br> git clone [https://github.com/seuusuario/seurepositorio.git](https://github.com/webarthu/BackendEstoque.git)<br>
 
-Entre no diretório do projeto:<br> cd seurepositorio<br>
+Entre no diretório do projeto:<br> cd BackendEstoque<br>
 
 Instale as bibliotecas:<br> pip install flask mysql-connector-python<br><br>
 
@@ -202,8 +202,8 @@ def get_connection():
 
 ```
 
-## ⚠️ Substitua com suas credenciais do banco.<br><br>
+### ⚠️ Substitua com suas credenciais do banco.<br><br>
 
 ---
 
-## made by: github.com/webarthu
+#### made by: [github.com/webarthu](https://github.com/webarthu)
