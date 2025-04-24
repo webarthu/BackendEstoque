@@ -1,11 +1,16 @@
-from flask import Flask
-from routes.clientes import clientes_bp 
-from routes.produtos import produtos_bp
-from routes.vendas import vendas_bp
+from flask import Flask  # Importa a classe Flask do pacote Flask, que é usada para criar a aplicação.
+from routes.clientes import clientes_bp  # Importa o blueprint 'clientes_bp' do módulo 'clientes' na pasta 'routes'.
+from routes.produtos import produtos_bp  # Importa o blueprint 'produtos_bp' do módulo 'produtos' na pasta 'routes'.
+from routes.vendas import vendas_bp  # Importa o blueprint 'vendas_bp' do módulo 'vendas' na pasta 'routes'.
 
-def create_app():
-    app = Flask(__name__)
+def create_app():  # Função para criar e configurar a aplicação Flask.
+    app = Flask(__name__)  # Cria uma instância da aplicação Flask.
 
-    app.register_blueprint(clientes_bp, produtos_bp, vendas_bp)
+    app.register_blueprint(clientes_bp, produtos_bp, vendas_bp)  # Registra os três blueprints na aplicação. 
+    # **Erro**: o método `register_blueprint` aceita apenas um blueprint por vez. 
+    # A forma correta seria registrá-los individualmente: 
+    # app.register_blueprint(clientes_bp)
+    # app.register_blueprint(produtos_bp)
+    # app.register_blueprint(vendas_bp)
 
-    return app
+    return app  # Retorna a instância da aplicação configurada com os blueprints registrados.
