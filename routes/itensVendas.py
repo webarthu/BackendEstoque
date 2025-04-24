@@ -83,3 +83,5 @@ def deleteItensVendas(id_iten):
     finally:
         cursor.close()
         con.close()
+
+        #commit teste
