@@ -12,16 +12,60 @@ def getProducts():
         cursor.execute("SELECT id, nome FROM Produtos")  # Executa a consulta para buscar todos os produtos.
         produtos = cursor.fetchall()  # Obtém todos os resultados da consulta.
 
+        if not produtos:
+            return jsonify({"status": "error", 
+                            "message": "Produtos não encontrados"
+                            }), 404
+        
         # Cria uma lista de dicionários com os dados dos produtos.
         produtos = [{"id produto": produto[0], "nome produto": produto[1]} for produto in produtos]
 
-        return jsonify({"Produtos": produtos}), 200  # Retorna os produtos como resposta JSON.
+        return jsonify({
+                        "status": "success", 
+                        "Produtos": [produtos]
+                        }), 200  # Retorna os produtos como resposta JSON.
+    
     except Exception as e:
-        return jsonify({"Error": str(e)}), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
+        return jsonify({"status": "error", 
+                        "message": str(e)
+                        }), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
     
     finally:
         cursor.close()  # Fecha o cursor.
         con.close()  # Fecha a conexão com o banco de dados.
+
+
+#GET WITH ID
+@produtos_bp.route('/Produtos/<int:id_produto>', methods=['GET'])
+def getProdutoID(id_produto):
+    con = get_connection()
+    try:
+        cursor = con.cursor()
+
+        cursor.execute("SELECT * FROM Produtos WHERE id=%s", (id_produto,))
+        produto = cursor.fetchone()
+
+        if not produto:
+            return jsonify({"status": "error", "message": "Produto não encontrado"}), 404
+
+        produto_dict = {"id": produto[0],
+                    "name": produto[1],
+                    "description": produto[2]
+                    }
+
+        return jsonify({"status": "success",
+                        "message": "produto encontrado com sucesso",
+                        "data": produto_dict
+                        }),200
+
+    except Exception as e:
+        return jsonify({"status": "Error",
+                         "message":str(e)
+                         }),500
+
+    finally:
+        cursor.close()
+        con.close()
 
 
 # POST - Rota para registrar um novo produto
@@ -38,13 +82,19 @@ def registerProduct():
         
         # Valida os dados obrigatórios para o cadastro.
         if not nome: 
-            return jsonify({"error": "Nome do produto é obrigatório"})
+            return jsonify({
+                "error": "Nome do produto é obrigatório"
+                }),400
         if not descricao: 
             descricao = ''  # Se não houver descrição, define uma descrição vazia.
         if not valor or valor <= 0: 
-            return jsonify({"error": "Valor obrigatório"})
+            return jsonify({
+                "error": "Valor obrigatório"
+                }),400
         if not quantidade or quantidade < 0: 
-            return jsonify({"error": "Quantidade de produtos obrigatória"})
+            return jsonify({
+                "error": "Quantidade de produtos obrigatória"
+                }),400
 
         # Insere o produto no banco de dados.
         cursor.execute("INSERT INTO Produtos (nome, descricao, valor, quantidade) VALUES (%s, %s, %s, %s)", 
@@ -54,12 +104,15 @@ def registerProduct():
         con.commit()  # Commit para salvar as mudanças no banco de dados.
         
         # Retorna uma resposta com os dados do produto cadastrado.
-        return jsonify({"Produto cadastrado": "Produto criado", 
-                        "ID Produto": produto_id, 
-                        "Nome produto": nome, 
-                        "Descrição produto": descricao, 
-                        "Valor do produto": valor, 
-                        "Qtd": quantidade}), 200
+        return jsonify({"status": "success",
+                        "message": "Product successfully registered",
+                        "product": {
+                        "id": produto_id,
+                        "name": nome,
+                        "description": descricao,
+                        "price": valor,
+                        "quantity": quantidade
+                    }}), 200
     
     except Exception as e:
         return jsonify({'Error': str(e)}), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
@@ -79,7 +132,9 @@ def changeProdutos(id):
         change = request.get_json()  # Obtém os dados da requisição JSON.
         
         if not change:
-            return jsonify({"message": "Nenhum dado enviado para o PATCH"}), 400  # Caso não haja dados na requisição.
+            return jsonify({
+                "message": "Nenhum dado enviado para o PATCH"
+                }), 400  # Caso não haja dados na requisição.
 
         # Cria uma string com os campos a serem atualizados.
         campos = ', '.join([f"{key} = %s" for key in change.keys()])
@@ -93,10 +148,15 @@ def changeProdutos(id):
         cursor.execute(query, valores)  # Executa a consulta de atualização.
         con.commit()  # Commit para salvar as mudanças no banco de dados.
 
-        return jsonify({"UPDATED": "Dados atualizados com sucesso!"}), 200  # Retorna uma mensagem de sucesso.
+        return jsonify({  
+                        "status": "success",
+                        "message": "Product updated successfully"  
+                        }), 200  # Retorna uma mensagem de sucesso.
     
     except Exception as e:
-        return jsonify({"Error": str(e)}), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
+        return jsonify({"status": "error", 
+                        "message": str(e)
+                        }), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
     
     finally:
         cursor.close()  # Fecha o cursor.
@@ -113,17 +173,25 @@ def deleteProduct(id):
 
         result = cursor.fetchone()  # Obtém o resultado da consulta.
         if not result:
-            return jsonify({"Error": "Produto não encontrado"}), 400  # Caso o produto não seja encontrado, retorna erro.
+            return jsonify({
+                "Error": "Produto não encontrado"
+                }), 404  # Caso o produto não seja encontrado, retorna erro.
         
         nome_produto = result[0]  # Obtém o nome do produto.
 
         cursor.execute("DELETE FROM Produtos WHERE id=%s", (id,))  # Deleta o produto do banco de dados.
         con.commit()  # Commit para salvar as mudanças no banco de dados.
 
-        return jsonify({"Message": "Produto deletado", "Nome do produto": nome_produto, "ID do produto": id}), 200  # Retorna uma mensagem de sucesso.
+        return jsonify({
+            "Message": "Produto deletado", 
+            "Nome do produto": nome_produto, 
+            "ID do produto": id
+            }), 200  # Retorna uma mensagem de sucesso.
     
     except Exception as e:
-        return jsonify({"Error": str(e)}), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
+        return jsonify({"status": "error",
+                        "message": str(e)
+                        }), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
     
     finally:
         cursor.close()  # Fecha o cursor.
