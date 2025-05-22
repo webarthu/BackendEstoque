@@ -33,6 +33,68 @@ def getVendas():
         cursor.close()  # Fecha o cursor.
         con.close()  # Fecha a conexão com o banco de dados.
 
+#GET WITH ID
+@vendas_bp.route('/Vendas/<int:id_venda>', methods=['GET'])
+def getVendaID(id_venda):
+    con = get_connection()
+    try:
+        cursor = con.cursor()
+
+        cursor.execute("SELECT * FROM Vendas WHERE id=%s", (id_venda,))
+        venda = cursor.fetchone()
+
+        if not venda:
+            return jsonify({"status": "error", 
+                            "message": "Venda não encontrada"
+                            }), 404
+
+        cursor.execute("SELECT nome FROM Clientes WHERE id=%s", (venda[3],))
+        cliente = cursor.fetchone()
+
+        nome_cliente = cliente[0]
+
+        venda_dict = {"id": venda[0],
+                    "data": venda[1],
+                    "valor total": venda[2],
+                    "id_cliente": venda[3],
+                    "nome_cliente": nome_cliente
+                    }
+        
+        cursor.execute("SELECT * FROM ItensVenda WHERE id_venda=%s", (id_venda,))
+        itens = cursor.fetchall()
+
+        if not itens:
+            return jsonify({"status":"error",
+                            "message": "itensvenda nao encontrados",
+                            }), 404
+        
+        itens_venda = [] 
+        
+        for item in itens:
+            itens_venda.append({
+                 "id": item[0],
+                "quantidade": item[1],
+                "valor_unitario": item[2],
+                "id_venda": item[3],
+                "id_produto": item[4]
+            })
+
+
+        return jsonify({"status": "success",
+                        "message": "venda encontrada com sucesso",
+                        "dados": venda_dict,
+                        "itensvenda": itens_venda
+                        }),200
+
+    except Exception as e:
+        return jsonify({"status": "Error",
+                         "message":str(e)
+                         }),500
+
+    finally:
+        cursor.close()
+        con.close()
+
 
 # POST - Rota para registrar uma nova venda
 @vendas_bp.route('/registerVendas', methods=['POST'])
