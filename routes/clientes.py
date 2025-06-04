@@ -9,11 +9,11 @@ def get_table():
     con = get_connection()  # Estabelece a conexão com o banco de dados.
     try:
         cursor = con.cursor()  # Cria um cursor para executar consultas no banco de dados.
-        cursor.execute("SELECT id, nome FROM Clientes")  # Executa a consulta para buscar os clientes.
+        cursor.execute("SELECT * FROM Clientes")  # Executa a consulta para buscar os clientes.
         clientes = cursor.fetchall()  # Obtém todos os resultados.
 
         # Formata os resultados em um formato mais amigável
-        clientes = [{"id cliente": cliente[0], "nome cliente": cliente[1]} for cliente in clientes]
+        clientes = [{"id_cliente": cliente[0], "nome_cliente": cliente[1], "telefone": cliente[2]} for cliente in clientes]
 
         return jsonify({"clientes": clientes}), 200  # Retorna a lista de clientes em formato JSON.
 

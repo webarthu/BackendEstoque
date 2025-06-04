@@ -6,11 +6,15 @@ itensVendas_bp = Blueprint('itensVendas', __name__)  # Cria um Blueprint para as
 # GET - Rota para obter os itens de uma venda específica
 @itensVendas_bp.route('/itensVendas/<int:id_venda>', methods=['GET'])
 def itensVendas(id_venda):
+    print('chamou funcao')
     con = get_connection()  # Estabelece a conexão com o banco de dados.
+    print('entrou na conexao')
     try:
-        cursor = con.cursor()  # Cria um cursor para executar consultas no banco de dados.
+        print('entrou')
+        cursor = con.cursor()
 
-        # Executa a consulta para buscar os itens da venda específica, com dados do produto relacionado.
+        # Consulta os itens da venda com o nome do produto.
+        
         cursor.execute("""
             SELECT i.id, i.quantidade, i.valor_unitario, i.id_venda, i.id_produto, p.nome
             FROM ItensVenda i
@@ -18,30 +22,34 @@ def itensVendas(id_venda):
             WHERE i.id_venda = %s
         """, (id_venda,))
 
-        itens = cursor.fetchall()  # Obtém todos os itens da venda.
+        print("id venda:", id_venda)
+        itens = cursor.fetchall()
 
-        if not itens:  # Caso não haja itens na venda, retorna um erro.
-            return jsonify({"Error": "itens não encontrados nessa venda"}), 404
+        if not itens:
+            return jsonify({"error": "Itens não encontrados nessa venda."}), 404
 
-        lista_itens = []  # Lista para armazenar os dados formatados dos itens.
+        lista_itens = []
         for item in itens:
             lista_itens.append({
-                "id": item[0],  # ID do item.
-                "quantidade": item[1],  # Quantidade do item.
-                "valor_produto": item[2],  # Valor unitário do produto.
-                "id_venda": item[3],  # ID da venda.
-                "id_produto": item[4],  # ID do produto.
-                "nome_produto": item[5]  # Nome do produto.
+                "id": item[0],
+                "quantidade": item[1],
+                "valor_unitario": item[2],
+                "id_venda": item[3],
+                "id_produto": item[4],
+                "nome_produto": item[5]
             })
 
-        return jsonify(lista_itens), 200  # Retorna a lista de itens da venda.
+        print(lista_itens)
+
+        return jsonify(lista_itens), 200  # Retorna a lista como JSON com status 200.
 
     except Exception as e:
-        return jsonify({"Error": str(e)}), 500  # Caso ocorra algum erro, retorna a mensagem de erro.
+        print("Erro ao buscar itens da venda:", e)
+        return jsonify({"Error": "Erro interno no servidor."}), 500
 
     finally:
-        cursor.close()  # Fecha o cursor.
-        con.close()  # Fecha a conexão com o banco de dados.
+        cursor.close()
+        con.close()
 
 
 # DELETE - Rota para deletar um item específico de uma venda
