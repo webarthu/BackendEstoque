@@ -9,7 +9,7 @@ def getProducts():
     con = get_connection()  # Estabelece a conexão com o banco de dados.
     try:
         cursor = con.cursor()  # Cria um cursor para executar consultas no banco de dados.
-        cursor.execute("SELECT id, nome FROM Produtos")  # Executa a consulta para buscar todos os produtos.
+        cursor.execute("SELECT * FROM Produtos")  # Executa a consulta para buscar todos os produtos.
         produtos = cursor.fetchall()  # Obtém todos os resultados da consulta.
 
         if not produtos:
@@ -18,7 +18,7 @@ def getProducts():
                             }), 404
         
         # Cria uma lista de dicionários com os dados dos produtos.
-        produtos = [{"id produto": produto[0], "nome produto": produto[1]} for produto in produtos]
+        produtos = [{"id_produto": produto[0], "nome_produto": produto[1], "descricao": produto[2], "valor": produto[3], "quantidade": produto[4]} for produto in produtos]
 
         return jsonify({
                         "status": "success", 
