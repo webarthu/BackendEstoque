@@ -4,7 +4,7 @@ from connection import get_connection  # Importa a função get_connection para 
 produtos_bp = Blueprint('produtos', __name__)  # Cria um Blueprint para as rotas de produtos.
 
 # GET - Rota para obter todos os produtos
-@produtos_bp.route('/Produtos', methods=['GET'])
+@produtos_bp.route('/Proddutos', methods=['GET'])
 def getProducts():
     con = get_connection()  # Estabelece a conexão com o banco de dados.
     try:
@@ -33,6 +33,58 @@ def getProducts():
     finally:
         cursor.close()  # Fecha o cursor.
         con.close()  # Fecha a conexão com o banco de dados.
+
+
+@produtos_bp.route('/Produtos', methods=['GET'])
+def get_produto_nome():
+    con = get_connection()
+    try:
+        cursor = con.cursor()
+        nome_produto = request.args.get('nome')
+
+        if not nome_produto:
+            return jsonify({"status": "error", "message": "Parâmetro 'nome' não fornecido"}), 400
+
+        like_pattern = f"%{nome_produto}%"
+        cursor.execute("SELECT * FROM Produtos WHERE nome LIKE %s", (like_pattern,))
+        produtos = cursor.fetchall()
+
+        print('produtos:', produtos)
+
+        if not produtos:
+            return jsonify({"status": "error", "message": "Produto não encontrado"}), 404
+
+        if len(produtos) > 1:
+            print("produtos", produtos)
+
+            return jsonify({
+            "status": "success",
+            "message": "Produtos encontrados com sucesso",
+            "data": produtos
+        }), 200
+        
+        else:
+            linha = produtos[0]
+            produto_dict = {
+                "id": linha[0],
+                "name": linha[1],
+                "description": linha[2]
+            }
+
+            print("produto_dict:", produto_dict)
+
+            return jsonify({
+                "status": "success",
+                "message": "Produto encontrado com sucesso",
+                "data": produto_dict
+            }), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    finally:
+        cursor.close()
+        con.close()
 
 
 #GET WITH ID
