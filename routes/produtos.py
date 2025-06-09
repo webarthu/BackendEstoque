@@ -4,7 +4,7 @@ from connection import get_connection  # Importa a função get_connection para 
 produtos_bp = Blueprint('produtos', __name__)  # Cria um Blueprint para as rotas de produtos.
 
 # GET - Rota para obter todos os produtos
-@produtos_bp.route('/Proddutos', methods=['GET'])
+@produtos_bp.route('/Produtos', methods=['GET'])
 def getProducts():
     con = get_connection()  # Estabelece a conexão com o banco de dados.
     try:
@@ -35,7 +35,7 @@ def getProducts():
         con.close()  # Fecha a conexão com o banco de dados.
 
 
-@produtos_bp.route('/Produtos', methods=['GET'])
+@produtos_bp.route('/Produtosnome', methods=['GET'])
 def get_produto_nome():
     con = get_connection()
     try:
